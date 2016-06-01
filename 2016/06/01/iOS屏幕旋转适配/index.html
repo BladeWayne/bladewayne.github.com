@@ -3,17 +3,24 @@
 <head>
   <meta charset="utf-8">
   
-  <title>程序员的自我修养</title>
+  <title>iOS屏幕旋转适配 | 程序员的自我修养</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description">
-<meta property="og:type" content="website">
-<meta property="og:title" content="程序员的自我修养">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="屏幕旋转适配前言现在大部分的智能移动设备通过自动旋转，能够自动切换去呈现最适合当前屏幕显示的内容，无疑大大提升了使用者的用户体验。不过作为开发者，想要达到完美的适配效果，还是要下一番功夫钻研尝试才能做得的。笔者就根据自己适配屏幕自动旋转的工作经验，在此做一点总结。
+硬件原理为了检测设备（最关键的就是面子——屏幕）当前在三维空间中的朝向，现在的智能设备都内置了加速计。这一部分我完全照抄了来源【1】：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS屏幕旋转适配">
+<meta property="og:url" content="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/index.html">
 <meta property="og:site_name" content="程序员的自我修养">
-<meta property="og:description">
+<meta property="og:description" content="屏幕旋转适配前言现在大部分的智能移动设备通过自动旋转，能够自动切换去呈现最适合当前屏幕显示的内容，无疑大大提升了使用者的用户体验。不过作为开发者，想要达到完美的适配效果，还是要下一番功夫钻研尝试才能做得的。笔者就根据自己适配屏幕自动旋转的工作经验，在此做一点总结。
+硬件原理为了检测设备（最关键的就是面子——屏幕）当前在三维空间中的朝向，现在的智能设备都内置了加速计。这一部分我完全照抄了来源【1】：">
+<meta property="og:image" content="http://s14.sinaimg.cn/middle/777694e9t771f8ec358bd&690">
+<meta property="og:image" content="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/app_config.png">
+<meta property="og:updated_time" content="2016-06-01T13:49:38.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="程序员的自我修养">
-<meta name="twitter:description">
+<meta name="twitter:title" content="iOS屏幕旋转适配">
+<meta name="twitter:description" content="屏幕旋转适配前言现在大部分的智能移动设备通过自动旋转，能够自动切换去呈现最适合当前屏幕显示的内容，无疑大大提升了使用者的用户体验。不过作为开发者，想要达到完美的适配效果，还是要下一番功夫钻研尝试才能做得的。笔者就根据自己适配屏幕自动旋转的工作经验，在此做一点总结。
+硬件原理为了检测设备（最关键的就是面子——屏幕）当前在三维空间中的朝向，现在的智能设备都内置了加速计。这一部分我完全照抄了来源【1】：">
+<meta name="twitter:image" content="http://s14.sinaimg.cn/middle/777694e9t771f8ec358bd&690">
   
     <link rel="alternate" href="/atom.xml" title="程序员的自我修养" type="application/atom+xml">
   
@@ -62,9 +69,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-iOS屏幕旋转适配" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-iOS屏幕旋转适配" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/06/01/iOS屏幕旋转适配/" class="article-date">
   <time datetime="2016-06-01T12:21:03.000Z" itemprop="datePublished">2016-06-01</time>
@@ -77,8 +82,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/06/01/iOS屏幕旋转适配/">iOS屏幕旋转适配</a>
+    <h1 class="article-title" itemprop="name">
+      iOS屏幕旋转适配
     </h1>
   
 
@@ -159,124 +164,19 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-Hello-World-0" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/06/01/Hello-World-0/" class="article-date">
-  <time datetime="2016-06-01T09:21:02.000Z" itemprop="datePublished">2016-06-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/06/01/Hello-World-0/">Hello World</a>
-    </h1>
+    <a href="/2016/06/01/Hello-World-0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="测试文章"><a href="#测试文章" class="headerlink" title="测试文章"></a>测试文章</h1><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>或许本质上我算是一个懒散的人吧，意识到这点后，要真的做点什么区改变自己……</p>
-<h3 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h3><h3 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h3><p>醉酒当歌，人生几何？譬如朝露，去日苦多！</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/Hello-World-0/" data-id="ciowxjv690000kgpbwhtkk0j3" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/无病呻吟/">无病呻吟</a></li></ul>
-
-    </footer>
-  </div>
   
 </article>
-
-
-  
-    <article id="post-开篇" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/06/01/开篇/" class="article-date">
-  <time datetime="2016-06-01T09:07:25.000Z" itemprop="datePublished">2016-06-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>#测试文章</p>
-<hr>
-<p>###前言<br>或许本质上我算是一个懒散的人吧，意识到这点后，要真的做点什么区改变自己……</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/开篇/" data-id="ciowxjv6l0003kgpbdupze9nh" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/06/01/hello-world/" class="article-date">
-  <time datetime="2016-06-01T08:46:07.000Z" itemprop="datePublished">2016-06-01</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/06/01/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/hello-world/" data-id="ciowxjv6f0001kgpb3jrdeh4o" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 </section>
         
