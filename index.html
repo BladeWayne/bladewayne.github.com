@@ -51,9 +51,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -118,8 +118,18 @@ typedef NS_ENUM(NSInteger, UIInterfaceOrientation) {
     UIInterfaceOrientationLandscapeLeft      = UIDeviceOrientationLandscapeRight,
     UIInterfaceOrientationLandscapeRight     = UIDeviceOrientationLandscapeLeft
 } __TVOS_PROHIBITED;
-</code></pre><p>二者的值也是可以对应得上。</p>
-<h3 id="朝向获取和设置"><a href="#朝向获取和设置" class="headerlink" title="朝向获取和设置"></a>朝向获取和设置</h3><p>有了朝向的定义，该如何获取当前的朝向取值呢？<br>如果是要获取设备朝向，可以直接通过 UIDevice 实例的属性</p>
+</code></pre><p>可见二者的枚举值相互之间对应得上。</p>
+<p>另外还有可组合使用的OrientationMask定义，通常在页面声明支持的朝向时用到，后面再展开讨论。</p>
+<pre><code>typedef NS_OPTIONS(NSUInteger, UIInterfaceOrientationMask) {
+    UIInterfaceOrientationMaskPortrait = (1 &lt;&lt; UIInterfaceOrientationPortrait),
+    UIInterfaceOrientationMaskLandscapeLeft = (1 &lt;&lt; UIInterfaceOrientationLandscapeLeft),
+    UIInterfaceOrientationMaskLandscapeRight = (1 &lt;&lt; UIInterfaceOrientationLandscapeRight),
+    UIInterfaceOrientationMaskPortraitUpsideDown = (1 &lt;&lt; UIInterfaceOrientationPortraitUpsideDown),
+    UIInterfaceOrientationMaskLandscape = (UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight),
+    UIInterfaceOrientationMaskAll = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight | UIInterfaceOrientationMaskPortraitUpsideDown),
+    UIInterfaceOrientationMaskAllButUpsideDown = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight),
+} __TVOS_PROHIBITED;
+</code></pre><h3 id="朝向获取和设置"><a href="#朝向获取和设置" class="headerlink" title="朝向获取和设置"></a>朝向获取和设置</h3><p>有了朝向的定义，该如何获取当前的朝向取值呢？<br>如果是要获取设备朝向，可以直接通过 UIDevice 实例的属性</p>
 <pre><code>// return current device orientation.  this will return UIDeviceOrientationUnknown unless device orientation notifications are being generated.
 @property(nonatomic,readonly) UIDeviceOrientation orientation __TVOS_PROHIBITED;       
 </code></pre><p>需要注意注释的内容，也就是必须首先在 UIDevice 朝向通知生成之后才可以正常获取朝向数据。</p>
@@ -135,23 +145,69 @@ name:UIDeviceOrientationDidChangeNotification object:nil];
 <p>类似的，也同样可以通过监听下面两个通知去获取UIInterfaceOrientation的变化：</p>
 <pre><code>UIKIT_EXTERN NSString *const UIApplicationWillChangeStatusBarOrientationNotification __TVOS_PROHIBITED; // userInfo contains NSNumber with new orientation
 UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotification __TVOS_PROHIBITED;  // userInfo contains NSNumber with old orientation
-</code></pre><p>二者的差异关键是在notification的userInfo中携带的值，一个是新的朝向，一个是旧的朝向，可不要搞反了哦。</p>
+</code></pre><p>二者的差异关键是在notification的userInfo中携带的值，一个是新的朝向值，一个是旧的朝向值，可不要搞反了哦。</p>
 <p>再有是通过UIApplication的下面这个属性也可以获取界面朝向。</p>
 <pre><code>// Explicit setting of the status bar orientation is more limited in iOS 6.0 and later.
 @property(readwrite, nonatomic) UIInterfaceOrientation statusBarOrientation NS_DEPRECATED_IOS(2_0, 9_0) __TVOS_PROHIBITED;
-</code></pre><hr>
-<p>另外，某些应用场景下，还需要去手动设置屏幕旋转，比如播放器往往都既支持自动旋转屏幕去切换全屏播放，也支持手动切换。但翻看了半天API描述和文档，要么就是不提供接口，要么就是警告设置受限，那要怎么做呢？其实很简单，只要两行代码搞定：</p>
+</code></pre><p>有的同学可能会有疑问，DeviceOrientation 和 StatusBarOrientation是否可以等同使用？关于这个问题，有句话说的好：</p>
+<blockquote>
+<p> 纸上得来终觉浅，绝知此事要躬行</p>
+</blockquote>
+<p>动手试一试就会明白，二者实则有着本质不同。</p>
+<p>*</p>
+<p>*</p>
+<p>*</p>
+<p>*</p>
+<p>*</p>
+<p>真相在此：前者是指示设备朝向，而后者则是指示当前界面中状态栏的朝向；在[UIDevice beginGeneratingDeviceOrientationNotifications]之后，每次设备旋转，都会有UIDeviceOrientationDidChangeNotification的通知生成，而 UIApplicationWillChangeStatusBarOrientationNotification 则是当前显示controller支持对应的InterfaceOrientation时才会触发。</p>
+<p>所以可能会出现这种情况，DeviceOrientation 值 为UIDeviceOrientationLandscapeLeft，但InterfaceOrientation 值却是 UIInterfaceOrientationPortrait，下图就是典型的例子：</p>
+<img src="/2016/06/01/iOS屏幕旋转适配/LandscapeDevicePortraitUI.png" alt="Device in Landscape but UI in Portrait" title="Device in Landscape but UI in Portrait">
+<hr>
+<p>另外，某些应用场景下，还需要去手动设置屏幕旋转，比如播放器往往都既支持自动旋转屏幕去切换全屏播放，同时也允许用户去手动切换全屏或小屏播放。但翻看了半天API描述和文档，要么就是不提供接口，要么就是警告设置受限，那要怎么做呢？其实很简单，只要两行代码搞定：</p>
 <pre><code>NSNumber *value = @(UIInterfaceOrientationPortrait);//或者别的想要的值
 [[UIDevice currentDevice] setValue:value forKey:@&quot;orientation&quot;];
-</code></pre><h3 id="App及页面适配"><a href="#App及页面适配" class="headerlink" title="App及页面适配"></a>App及页面适配</h3><p>App中全局配置支持朝向的地方，最方便的就是在工程的Target中了，如图所示：</p>
+</code></pre><h3 id="App及页面适配"><a href="#App及页面适配" class="headerlink" title="App及页面适配"></a>App及页面适配</h3><ul>
+<li>App全局配置</li>
+</ul>
+<p>App中全局配置支持朝向的地方，最方便的就是在工程的Target中了，如图所示：</p>
 <img src="/2016/06/01/iOS屏幕旋转适配/app_config.png" alt="App全局配置" title="App全局配置">
+<p>理所当然全局配置其优先级当然是最高的，即使某个页面声明支持某Orientation，但全局配置中并没有选中对应的Device Orientation，是不会起效的。</p>
+<ul>
+<li><p>单个页面配置<br>具体到某个页面（controller）层级的配置，UIViewController提供了如下的回调方法</p>
+<pre><code>// New Autorotation support.
+- (BOOL)shouldAutorotate NS_AVAILABLE_IOS(6_0) __TVOS_PROHIBITED;
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations NS_AVAILABLE_IOS(6_0) __TVOS_PROHIBITED;
+// Returns interface orientation masks.
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation NS_AVAILABLE_IOS(6_0) __TVOS_PROHIBITED;
+</code></pre></li>
+</ul>
+<p>第一个方法在首次进入controller以及屏幕方向未锁定且触发旋转时会被系统调用（且不重写的话，默认返回值为YES），如果返回NO，那么表明该页面不支持对屏幕旋转做适配；若返回YES，则表明支持旋转，但具体适配了哪几个朝向，则依赖于supportedInterfaceOrientations 方法的返回值，也就是UIInterfaceOrientationMask类型的Option组合。</p>
+<p>看起来并不复杂对不对？在设定了App的全局配置，并在相应的controller中实现了这些回调之后发现，有同学可能会失望地发现，设备旋转时这些方法却并没有期望地那样被调到，这是为什么呢？</p>
+<p>通过反复验证，发现其实系统确实会调用这个方法，但默认执行粒度是到系统级的 Container View Controller(UINavigationController/UITabBarController)为止（其实直接挂在UIWindow上作为其rootViewController的UIViewController对象也会得到调用，但毕竟大多数情况下，我们不会用这么简单的组合结构的）。所以我们额外需要实现的一步，就是转发这个调用消息到我们真正想要处理的那个controller上。当然，可以通过hook系统类的对应方法去做实现，但笔者采用的是在自行定义的UINavigationController继承类中重写这些方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">#pragma mark Orientation</span><br><span class="line"></span><br><span class="line">- (BOOL)shouldAutorotate</span><br><span class="line">&#123;</span><br><span class="line">    BOOL shouldAutorotate = NO;</span><br><span class="line">    UIViewController *viewController;</span><br><span class="line">    if (IOS_VERSION_FLOAT_VALUE &gt;= 8.0)</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self visibleViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self topViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:K12RootViewController.class] &amp;&amp; ((K12RootViewController *)viewController).visibleNav) &#123;</span><br><span class="line">        viewController = ((K12RootViewController *)viewController).visibleNav;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if (viewController.ht_currentChildViewController) &#123;</span><br><span class="line">        viewController = viewController.ht_currentChildViewController;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:[UIViewController class]])</span><br><span class="line">    &#123;</span><br><span class="line">        shouldAutorotate = [(UIViewController *)viewController shouldAutorotate];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //弹框也要支持旋转</span><br><span class="line">    if ([viewController isKindOfClass:K12PlayerController.class] || ((IOS_VERSION_FLOAT_VALUE &gt;= 8.0) ? [viewController isKindOfClass:UIAlertController.class] : NO)) &#123;</span><br><span class="line">        return YES;</span><br><span class="line">    &#125;</span><br><span class="line">    else &#123;</span><br><span class="line">        return NO;</span><br><span class="line">    &#125;</span><br><span class="line">    return shouldAutorotate;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (UIInterfaceOrientationMask)supportedInterfaceOrientations</span><br><span class="line">&#123;    </span><br><span class="line">    NSUInteger supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;</span><br><span class="line">    UIViewController *viewController;</span><br><span class="line">    if (IOS_VERSION_FLOAT_VALUE &gt;= 8.0)</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self visibleViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self topViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:K12RootViewController.class] &amp;&amp; ((K12RootViewController *)viewController).visibleNav) &#123;</span><br><span class="line">        viewController = ((K12RootViewController *)viewController).visibleNav;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if (viewController.ht_currentChildViewController) &#123;</span><br><span class="line">        viewController = viewController.ht_currentChildViewController;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //向UIAlertController发送supportedInterfaceOrientations消息会crash……</span><br><span class="line">    if ([viewController isKindOfClass:UIAlertController.class]) &#123;</span><br><span class="line">        return UIInterfaceOrientationMaskAllButUpsideDown;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:[UIViewController class]])</span><br><span class="line">    &#123;</span><br><span class="line">        supportedInterfaceOrientations = [(UIViewController *)viewController supportedInterfaceOrientations];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return supportedInterfaceOrientations;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到其中有各种各样case的处理，原因就是除了播放页面支持竖屏、左横屏以及右横屏(UIInterfaceOrientationMaskAllButUpsideDown)之外，我们产品中的其他页面都是只支持横屏显示的(UIInterfaceOrientationMaskPortrait)，同时在当前页面上有UIAlertController(iOS8 之后）弹出时，也要设置其支持跟随屏幕旋转。</p>
+<p>类似的，如果 UIWindow 对象的 rootViewController 是 UITabBarController 的话，则需要转发消息给其 selectedViewController 属性对象，具体实现就不再赘言啦。</p>
+<ul>
+<li>踩过的坑</li>
+</ul>
+<p>说起来，项目开发中不踩点坑简直对不起程序猿这个title啊 —— 前面提到过</p>
+<blockquote>
+<p>其实直接挂在UIWindow上作为其rootViewController的UIViewController对象也会得到调用</p>
+</blockquote>
+<p>这里往往会隐藏一个问题，默认在AppDelegate.m中，我们会这样做：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions &#123;</span><br><span class="line">	...</span><br><span class="line">	self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];</span><br><span class="line">	</span><br><span class="line">	self.k12RootController = [[K12RootViewController alloc] init];</span><br><span class="line">    K12NavigationController *navController = [[K12NavigationController alloc] initWithRootViewController: self.k12RootController];</span><br><span class="line">    </span><br><span class="line">    self.window.rootViewController = navController;</span><br><span class="line">    </span><br><span class="line">	[self.window makeKeyAndVisible];</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然，这看起来没有问题。但是假如App中还存在别的 UIWindow 对象呢？旋转时，它的rootViewController 的 shouldAutoRotate 方法也将被调用，若没有重写过，则其默认返回YES；如果与其他 UIWindow对象(特别是keyWindow) 所呈现的最顶部页面的返回值不一致，就会出现一些神奇的表现，如下图所示：</p>
+<img src="/2016/06/01/iOS屏幕旋转适配/statusBarChangeInRotation.gif" alt="status bar change when rotated" title="status bar change when rotated">
+<p>该情况的出现，就是因为在该答题页面的上一个页面（播放页面）中使用了一个第三方组件去绘制Menu，而其设计存在瑕疵，在生成Menu对象而非显示时就已经生成了一个UIWindow对象并持有了它。然后在进入答题页面时，虽然对应的controller的 shouldAutoRotate 方法返回了 NO，但Menu对应的UIWindow对象其rootViewController默认返回YES，导致出现页面保持竖屏显示，但状态栏响应了旋转的奇怪现象。</p>
+<p>这个问题最终还是通过hook掉 UIViewController 的shouldAutoRotate 方法，去追踪究竟是哪个controller对象返回了默认值 YES 才最终大白天下。这也提醒我们，对开源库的品质也是谨慎对待的，往往太复杂业务场景，还是需要自己去定制功能才能满足。</p>
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>【1】<a href="http://blog.csdn.net/lv_ruanruan/article/details/19899103" target="_blank" rel="external">ios 关于屏幕旋转和屏幕晃动</a></p>
 <p>【2】<a href="http://www.jianshu.com/p/d8018006f0b5" target="_blank" rel="external">iOS指定页面屏幕旋转，手动旋转（某app实现功能全过程）</a></p>
+<p>【3】<a href="https://happyteamlabs.com/blog/ios-using-uideviceorientation-to-determine-orientation/" target="_blank" rel="external">iOS: Using UIDeviceOrientation to Determine Orientation</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/" data-id="ciowxqe6h0003lgpbbdx0ty8l" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/" data-id="cioy3vbln0003oupb1cfjt44d" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/屏幕旋转/">屏幕旋转</a></li></ul>
@@ -191,7 +247,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/Hello-World-0/" data-id="ciowxqe5w0000lgpbgtq5095m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/06/01/Hello-World-0/" data-id="cioy3vbld0000oupbepkfkgz2" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/无病呻吟/">无病呻吟</a></li></ul>
@@ -222,7 +278,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/开篇/" data-id="ciowxqe6i0004lgpbicy85kiv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/06/01/开篇/" data-id="cioy3vblp0004oupbfjdzfehg" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -267,7 +323,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/hello-world/" data-id="ciowxqe620001lgpbi9g98d06" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/06/01/hello-world/" data-id="cioy3vblh0001oupbuxgwk6zx" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -287,7 +343,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Mot-clés</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/iOS/">iOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/屏幕旋转/">屏幕旋转</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无病呻吟/">无病呻吟</a></li></ul>
     </div>
@@ -297,7 +353,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">Nuage de mot-clés</h3>
     <div class="widget tagcloud">
       <a href="/tags/iOS/" style="font-size: 10px;">iOS</a> <a href="/tags/屏幕旋转/" style="font-size: 10px;">屏幕旋转</a> <a href="/tags/无病呻吟/" style="font-size: 10px;">无病呻吟</a>
     </div>
@@ -316,7 +372,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
         
@@ -349,7 +405,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2016 Wayne Wei<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
