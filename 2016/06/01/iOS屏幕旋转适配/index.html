@@ -17,7 +17,7 @@
 <meta property="og:image" content="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/LandscapeDevicePortraitUI.png">
 <meta property="og:image" content="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/app_config.png">
 <meta property="og:image" content="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/statusBarChangeInRotation.gif">
-<meta property="og:updated_time" content="2016-06-02T09:40:13.000Z">
+<meta property="og:updated_time" content="2016-06-02T11:12:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS屏幕旋转适配">
 <meta name="twitter:description" content="屏幕旋转适配前言现在大部分的智能移动设备通过自动旋转，能够自动切换去呈现最适合当前屏幕显示的内容，无疑大大提升了使用者的用户体验。不过作为开发者，想要达到完美的适配效果，还是要下一番功夫钻研尝试才能做得的。笔者就根据自己适配屏幕自动旋转的工作经验，在此做一点总结。
@@ -60,9 +60,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -190,7 +190,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
 </ul>
 <p>第一个方法在首次进入controller以及屏幕方向未锁定且触发旋转时会被系统调用（且不重写的话，默认返回值为YES），如果返回NO，那么表明该页面不支持对屏幕旋转做适配；若返回YES，则表明支持旋转，但具体适配了哪几个朝向，则依赖于supportedInterfaceOrientations 方法的返回值，也就是UIInterfaceOrientationMask类型的Option组合。</p>
 <p>看起来并不复杂对不对？在设定了App的全局配置，并在相应的controller中实现了这些回调之后发现，有同学可能会失望地发现，设备旋转时这些方法却并没有期望地那样被调到，这是为什么呢？</p>
-<p>通过反复验证，发现其实系统确实会调用这个方法，但默认执行粒度是到系统级的 Container View Controller(UINavigationController/UITabBarController)为止（其实直接挂在UIWindow上作为其rootViewController的UIViewController对象也会得到调用，但毕竟大多数情况下，我们不会用这么简单的组合结构的）。所以我们额外需要实现的一步，就是转发这个调用消息到我们真正想要处理的那个controller上。当然，可以通过hook系统类的对应方法去做实现，但笔者采用的是在自行定义的UINavigationController继承类中重写这些方法：</p>
+<p>通过反复验证，发现其实系统确实会调用这个方法，但默认执行粒度是到系统级的 Container View Controller(UINavigationController/UITabBarController)为止（其实直接挂在UIWindow上作为其rootViewController的UIViewController对象的 shouldAutoRotate 方法也会得到调用，但毕竟大多数情况下，我们不会用这么简单的组合结构的）。所以我们额外需要实现的一步，就是转发这个调用消息到我们真正想要处理的那个controller上。当然，可以通过hook系统类的对应方法去做实现，但笔者采用的是在自行定义的UINavigationController继承类中重写这些方法：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">#pragma mark Orientation</span><br><span class="line"></span><br><span class="line">- (BOOL)shouldAutorotate</span><br><span class="line">&#123;</span><br><span class="line">    BOOL shouldAutorotate = NO;</span><br><span class="line">    UIViewController *viewController;</span><br><span class="line">    if (IOS_VERSION_FLOAT_VALUE &gt;= 8.0)</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self visibleViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self topViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:K12RootViewController.class] &amp;&amp; ((K12RootViewController *)viewController).visibleNav) &#123;</span><br><span class="line">        viewController = ((K12RootViewController *)viewController).visibleNav;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if (viewController.ht_currentChildViewController) &#123;</span><br><span class="line">        viewController = viewController.ht_currentChildViewController;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:[UIViewController class]])</span><br><span class="line">    &#123;</span><br><span class="line">        shouldAutorotate = [(UIViewController *)viewController shouldAutorotate];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //弹框也要支持旋转</span><br><span class="line">    if ([viewController isKindOfClass:K12PlayerController.class] || ((IOS_VERSION_FLOAT_VALUE &gt;= 8.0) ? [viewController isKindOfClass:UIAlertController.class] : NO)) &#123;</span><br><span class="line">        return YES;</span><br><span class="line">    &#125;</span><br><span class="line">    else &#123;</span><br><span class="line">        return NO;</span><br><span class="line">    &#125;</span><br><span class="line">    return shouldAutorotate;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (UIInterfaceOrientationMask)supportedInterfaceOrientations</span><br><span class="line">&#123;    </span><br><span class="line">    NSUInteger supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;</span><br><span class="line">    UIViewController *viewController;</span><br><span class="line">    if (IOS_VERSION_FLOAT_VALUE &gt;= 8.0)</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self visibleViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        viewController = [self topViewController];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:K12RootViewController.class] &amp;&amp; ((K12RootViewController *)viewController).visibleNav) &#123;</span><br><span class="line">        viewController = ((K12RootViewController *)viewController).visibleNav;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if (viewController.ht_currentChildViewController) &#123;</span><br><span class="line">        viewController = viewController.ht_currentChildViewController;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    //向UIAlertController发送supportedInterfaceOrientations消息会crash……</span><br><span class="line">    if ([viewController isKindOfClass:UIAlertController.class]) &#123;</span><br><span class="line">        return UIInterfaceOrientationMaskAllButUpsideDown;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    if ([viewController isKindOfClass:[UIViewController class]])</span><br><span class="line">    &#123;</span><br><span class="line">        supportedInterfaceOrientations = [(UIViewController *)viewController supportedInterfaceOrientations];</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return supportedInterfaceOrientations;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以看到其中有各种各样case的处理，原因就是除了播放页面支持竖屏、左横屏以及右横屏(UIInterfaceOrientationMaskAllButUpsideDown)之外，我们产品中的其他页面都是只支持横屏显示的(UIInterfaceOrientationMaskPortrait)，同时在当前页面上有UIAlertController(iOS8 之后）弹出时，也要设置其支持跟随屏幕旋转。</p>
 <p>类似的，如果 UIWindow 对象的 rootViewController 是 UITabBarController 的话，则需要转发消息给其 selectedViewController 属性对象，具体实现就不再赘言啦。</p>
@@ -199,7 +199,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
 </ul>
 <p>说起来，项目开发中不踩点坑简直对不起程序猿这个title啊 —— 前面提到过</p>
 <blockquote>
-<p>其实直接挂在UIWindow上作为其rootViewController的UIViewController对象也会得到调用</p>
+<p>…挂在UIWindow上作为其rootViewController的UIViewController对象的 shouldAutoRotate 方法也会得到调用</p>
 </blockquote>
 <p>这里往往会隐藏一个问题，默认在AppDelegate.m中，我们会这样做：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions &#123;</span><br><span class="line">	...</span><br><span class="line">	self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];</span><br><span class="line">	</span><br><span class="line">	self.k12RootController = [[K12RootViewController alloc] init];</span><br><span class="line">    K12NavigationController *navController = [[K12NavigationController alloc] initWithRootViewController: self.k12RootController];</span><br><span class="line">    </span><br><span class="line">    self.window.rootViewController = navController;</span><br><span class="line">    </span><br><span class="line">	[self.window makeKeyAndVisible];</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -216,7 +216,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/" data-id="cioy3vbln0003oupb1cfjt44d" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/06/01/iOS屏幕旋转适配/" data-id="cioy3vbln0003oupb1cfjt44d" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/屏幕旋转/">屏幕旋转</a></li></ul>
@@ -229,7 +229,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   
   
     <a href="/2016/06/01/Hello-World-0/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">Ancien</strong>
       <div class="article-nav-title">Hello World</div>
     </a>
   
@@ -247,7 +247,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Mot-clés</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/iOS/">iOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/屏幕旋转/">屏幕旋转</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/无病呻吟/">无病呻吟</a></li></ul>
     </div>
@@ -257,7 +257,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">Nuage de mot-clés</h3>
     <div class="widget tagcloud">
       <a href="/tags/iOS/" style="font-size: 10px;">iOS</a> <a href="/tags/屏幕旋转/" style="font-size: 10px;">屏幕旋转</a> <a href="/tags/无病呻吟/" style="font-size: 10px;">无病呻吟</a>
     </div>
@@ -276,7 +276,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
         
@@ -309,7 +309,7 @@ UIKIT_EXTERN NSString *const UIApplicationDidChangeStatusBarOrientationNotificat
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2016 Wayne Wei<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
