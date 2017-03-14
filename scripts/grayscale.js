@@ -7,6 +7,8 @@ function convertToGS(img) {
   
   // Create a grayscale version.
   img.grayscale = createGSCanvas(img);
+
+  alert(img.grayscale)
   
   // Swap the images on mouseover/out 
 	img.onmouseover = function() {
